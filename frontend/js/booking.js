@@ -44,7 +44,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 month: 'long',
                 day: 'numeric'
             });
-            document.getElementById('summary-date').textContent = formattedDate;
+            // Ensure elements exist before accessing them
+            if (document.getElementById('summary-date')) {
+                document.getElementById('summary-date').textContent = formattedDate;
+            }
             console.log('Date selected:', formattedDate);
         });
     }
@@ -137,4 +140,4 @@ document.addEventListener('DOMContentLoaded', function() {
             window.location.href = 'booking-success.html';
         });
     }
-}); 
+});
