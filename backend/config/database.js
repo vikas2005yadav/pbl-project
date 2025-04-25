@@ -127,11 +127,11 @@ async function setupDatabase() {
             // Settings Table
             `CREATE TABLE IF NOT EXISTS settings (
                 id INT AUTO_INCREMENT PRIMARY KEY,
-                key VARCHAR(50) NOT NULL,
+                \`key\` VARCHAR(50) NOT NULL,
                 value TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                UNIQUE INDEX unique_key (key)
+                UNIQUE INDEX unique_key (\`key\`)
             )`
         ];
 
@@ -154,7 +154,7 @@ async function setupDatabase() {
         if (existingSettings[0].count === 0) {
             // Insert default settings
             for (const [key, value] of defaultSettings) {
-                await pool.query('INSERT INTO settings (key, value) VALUES (?, ?)', [key, value]);
+                await pool.query('INSERT INTO settings (`key`, value) VALUES (?, ?)', [key, value]);
             }
         }
 
@@ -190,4 +190,4 @@ module.exports = {
     initializeDatabase,
     query,
     getConnection
-}; 
+};
