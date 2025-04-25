@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Successful - CNG Pump Slot Booking</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .success-container {
+            max-width: 600px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: #28a745;
+            margin-bottom: 1rem;
+        }
+
+        .success-message {
+            margin-bottom: 2rem;
+        }
+
+        .success-message h1 {
+            color: #28a745;
+            margin-bottom: 0.5rem;
+        }
+
+        .booking-details {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: left;
+            margin-bottom: 2rem;
+        }
+
+        .booking-details h3 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        .booking-details p {
+            margin: 0.5rem 0;
+            color: #666;
+        }
+
+        .booking-details strong {
+            color: var(--dark-color);
+        }
+
+        .action-buttons {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            text-decoration: none;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-outline {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <h1>CNG Booking</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="booking.html">Book Slot</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="success-container">
+        <i class="fas fa-check-circle success-icon"></i>
+        
+        <div class="success-message">
+            <h1>Booking Successful!</h1>
+            <p>Your CNG slot has been successfully booked.</p>
+        </div>
+
+        <div class="booking-details">
+            <h3>Booking Details</h3>
+            <div id="booking-info">
+                <!-- Booking details will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="booking.html" class="btn btn-primary">Book Another Slot</a>
+            <a href="../index.html" class="btn btn-outline">Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get the latest booking from localStorage
+            const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+            const latestBooking = bookings[bookings.length - 1];
+
+            if (latestBooking) {
+                document.getElementById('booking-info').innerHTML = `
+                    <p><strong>Booking ID:</strong> ${latestBooking.bookingId}</p>
+                    <p><strong>Pump:</strong> ${latestBooking.pump}</p>
+                    <p><strong>Date:</strong> ${latestBooking.date}</p>
+                    <p><strong>Time:</strong> ${latestBooking.time}</p>
+                    <p><strong>Booked on:</strong> ${new Date(latestBooking.createdAt).toLocaleString()}</p>
+                `;
+
+                // Log the booking details to console
+                console.log('Booking details:', latestBooking);
+            } else {
+                console.error('No booking found in localStorage');
+                document.getElementById('booking-info').innerHTML = `
+                    <p>No booking details found.</p>
+                `;
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | CNG Booking System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-body">
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-gas-pump"></i> CNG Admin</h3>
+            </div>
+            <div class="sidebar-menu">
+                <ul>
+                    <li class="active">
+                        <a href="#dashboard" class="sidebar-link" data-section="dashboard">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#bookings" class="sidebar-link" data-section="bookings">
+                            <i class="fas fa-calendar-check"></i> Bookings
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#users" class="sidebar-link" data-section="users">
+                            <i class="fas fa-users"></i> Users
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#slots" class="sidebar-link" data-section="slots">
+                            <i class="fas fa-clock"></i> Time Slots
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#settings" class="sidebar-link" data-section="settings">
+                            <i class="fas fa-cog"></i> Settings
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="admin-main">
+            <!-- Header -->
+            <header class="admin-header">
+                <div class="header-search">
+                    <input type="text" placeholder="Search...">
+                    <button><i class="fas fa-search"></i></button>
+                </div>
+                <div class="header-right">
+                    <div class="dropdown">
+                        <button class="dropdown-toggle">
+                            <i class="fas fa-user-circle"></i> Admin
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Sections -->
+            <div class="admin-content">
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="content-section active">
+                    <div class="section-header">
+                        <h2>Dashboard</h2>
+                        <p>Welcome to the CNG Booking System Admin Panel</p>
+                    </div>
+                    
+                    <div class="stats-container">
+                        <div class="stats-card">
+                            <div class="stats-icon blue">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div class="stats-info">
+                                <h3 id="totalBookings">0</h3>
+                                <p>Total Bookings</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stats-card">
+                            <div class="stats-icon green">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stats-info">
+                                <h3 id="totalUsers">0</h3>
+                                <p>Registered Users</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stats-card">
+                            <div class="stats-icon orange">
+                                <i class="fas fa-calendar-day"></i>
+                            </div>
+                            <div class="stats-info">
+                                <h3 id="todayBookings">0</h3>
+                                <p>Today's Bookings</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stats-card">
+                            <div class="stats-icon purple">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="stats-info">
+                                <h3 id="bookingRate">0%</h3>
+                                <p>Booking Rate</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <h3>Recent Bookings</h3>
+                                <a href="#bookings" class="view-all">View All</a>
+                            </div>
+                            <div class="card-body">
+                                <table class="dashboard-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>User</th>
+                                            <th>Date</th>
+                                            <th>Time</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recentBookingsList">
+                                        <!-- Will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <h3>New Users</h3>
+                                <a href="#users" class="view-all">View All</a>
+                            </div>
+                            <div class="card-body">
+                                <table class="dashboard-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Joined</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recentUsersList">
+                                        <!-- Will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Bookings Section -->
+                <section id="bookings" class="content-section">
+                    <div class="section-header">
+                        <h2>Manage Bookings</h2>
+                        <div class="section-actions">
+                            <input type="date" id="bookingDateFilter">
+                            <select id="bookingStatusFilter">
+                                <option value="all">All Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                            <button id="refreshBookings" class="btn-refresh">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>User</th>
+                                    <th>Vehicle Number</th>
+                                    <th>Date</th>
+                                    <th>Time Slot</th>
+                                    <th>Status</th>
+                                    <th>Created At</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bookingsTableBody">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                        <div id="bookingsPagination" class="pagination">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Users Section -->
+                <section id="users" class="content-section">
+                    <div class="section-header">
+                        <h2>Manage Users</h2>
+                        <div class="section-actions">
+                            <input type="text" id="userSearchInput" placeholder="Search users...">
+                            <button id="refreshUsers" class="btn-refresh">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>User ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Bookings</th>
+                                    <th>Join Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                        <div id="usersPagination" class="pagination">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Time Slots Section -->
+                <section id="slots" class="content-section">
+                    <div class="section-header">
+                        <h2>Manage Time Slots</h2>
+                        <div class="section-actions">
+                            <button id="addSlotBtn" class="btn-primary">
+                                <i class="fas fa-plus"></i> Add Slot
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Slot ID</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Capacity</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="slotsTableBody">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Settings Section -->
+                <section id="settings" class="content-section">
+                    <div class="section-header">
+                        <h2>System Settings</h2>
+                    </div>
+                    
+                    <div class="settings-container">
+                        <div class="settings-card">
+                            <div class="card-header">
+                                <h3>General Settings</h3>
+                            </div>
+                            <div class="card-body">
+                                <form id="generalSettingsForm">
+                                    <div class="form-group">
+                                        <label for="siteName">Site Name</label>
+                                        <input type="text" id="siteName" value="CNG Booking System">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="bookingLeadTime">Booking Lead Time (hours)</label>
+                                        <input type="number" id="bookingLeadTime" value="1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="maxActiveBookings">Max Active Bookings Per User</label>
+                                        <input type="number" id="maxActiveBookings" value="2">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="maintenanceMode">Maintenance Mode</label>
+                                        <div class="toggle-switch">
+                                            <input type="checkbox" id="maintenanceMode">
+                                            <label for="maintenanceMode"></label>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn-primary">
+                                        <i class="fas fa-save"></i> Save Settings
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Add/Edit Slot -->
+    <div id="slotModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="slotModalTitle">Add Time Slot</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="slotForm">
+                    <input type="hidden" id="slotId">
+                    <div class="form-group">
+                        <label for="startTime">Start Time</label>
+                        <input type="time" id="startTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="endTime">End Time</label>
+                        <input type="time" id="endTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="slotCapacity">Capacity</label>
+                        <input type="number" id="slotCapacity" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="slotStatus">Status</label>
+                        <select id="slotStatus">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary close-modal">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Slot</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if admin is logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!sessionStorage.getItem('adminLoggedIn')) {
+                window.location.href = 'admin-login.html';
+                return;
+            }
+            
+            // Setup navigation
+            const sidebarLinks = document.querySelectorAll('.sidebar-link');
+            const contentSections = document.querySelectorAll('.content-section');
+            
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Update active sidebar link
+                    sidebarLinks.forEach(l => l.parentElement.classList.remove('active'));
+                    this.parentElement.classList.add('active');
+                    
+                    // Show active section
+                    const targetSection = this.getAttribute('data-section');
+                    contentSections.forEach(section => {
+                        if (section.id === targetSection) {
+                            section.classList.add('active');
+                        } else {
+                            section.classList.remove('active');
+                        }
+                    });
+                });
+            });
+            
+            // Logout functionality
+            document.getElementById('logoutBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                sessionStorage.removeItem('adminLoggedIn');
+                window.location.href = 'admin-login.html';
+            });
+            
+            // Toggle dropdown
+            const dropdownToggle = document.querySelector('.dropdown-toggle');
+            dropdownToggle.addEventListener('click', function() {
+                this.nextElementSibling.classList.toggle('show');
+            });
+            
+            // Close dropdown when clicking outside
+            window.addEventListener('click', function(e) {
+                if (!e.target.matches('.dropdown-toggle')) {
+                    const dropdowns = document.querySelectorAll('.dropdown-menu');
+                    dropdowns.forEach(dropdown => {
+                        if (dropdown.classList.contains('show')) {
+                            dropdown.classList.remove('show');
+                        }
+                    });
+                }
+            });
+            
+            // Modal functionality
+            const modal = document.getElementById('slotModal');
+            const addSlotBtn = document.getElementById('addSlotBtn');
+            const closeModalBtns = document.querySelectorAll('.close-modal');
+            
+            addSlotBtn.addEventListener('click', function() {
+                document.getElementById('slotModalTitle').textContent = 'Add Time Slot';
+                document.getElementById('slotForm').reset();
+                document.getElementById('slotId').value = '';
+                modal.style.display = 'block';
+            });
+            
+            closeModalBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    modal.style.display = 'none';
+                });
+            });
+            
+            window.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+            
+            // Load mock data for demonstration
+            loadMockData();
+        });
+        
+        // Function to load mock data
+        function loadMockData() {
+            // Dashboard stats
+            document.getElementById('totalBookings').textContent = '157';
+            document.getElementById('totalUsers').textContent = '45';
+            document.getElementById('todayBookings').textContent = '12';
+            document.getElementById('bookingRate').textContent = '78%';
+            
+            // Recent bookings
+            const recentBookings = [
+                { id: 'B1001', user: 'John Doe', date: '2023-05-15', time: '10:00 AM', status: 'completed' },
+                { id: 'B1002', user: 'Jane Smith', date: '2023-05-15', time: '11:30 AM', status: 'confirmed' },
+                { id: 'B1003', user: 'Mike Johnson', date: '2023-05-16', time: '09:00 AM', status: 'pending' },
+                { id: 'B1004', user: 'Sara Williams', date: '2023-05-16', time: '02:00 PM', status: 'cancelled' }
+            ];
+            
+            const recentBookingsList = document.getElementById('recentBookingsList');
+            recentBookingsList.innerHTML = '';
+            
+            recentBookings.forEach(booking => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${booking.id}</td>
+                    <td>${booking.user}</td>
+                    <td>${booking.date}</td>
+                    <td>${booking.time}</td>
+                    <td><span class="badge ${booking.status}">${booking.status}</span></td>
+                `;
+                recentBookingsList.appendChild(row);
+            });
+            
+            // Recent users
+            const recentUsers = [
+                { id: 'U101', name: 'John Doe', email: 'john@example.com', joined: '2023-05-10' },
+                { id: 'U102', name: 'Jane Smith', email: 'jane@example.com', joined: '2023-05-11' },
+                { id: 'U103', name: 'Mike Johnson', email: 'mike@example.com', joined: '2023-05-12' },
+                { id: 'U104', name: 'Sara Williams', email: 'sara@example.com', joined: '2023-05-13' }
+            ];
+            
+            const recentUsersList = document.getElementById('recentUsersList');
+            recentUsersList.innerHTML = '';
+            
+            recentUsers.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.joined}</td>
+                `;
+                recentUsersList.appendChild(row);
+            });
+            
+            // Bookings table
+            const bookings = [
+                { id: 'B1001', user: 'John Doe', vehicle: 'MH01AB1234', date: '2023-05-15', time: '10:00 - 10:30 AM', status: 'completed', created: '2023-05-14 09:15 AM' },
+                { id: 'B1002', user: 'Jane Smith', vehicle: 'MH02CD5678', date: '2023-05-15', time: '11:30 - 12:00 PM', status: 'confirmed', created: '2023-05-14 10:20 AM' },
+                { id: 'B1003', user: 'Mike Johnson', vehicle: 'MH03EF9012', date: '2023-05-16', time: '09:00 - 09:30 AM', status: 'pending', created: '2023-05-15 08:45 AM' },
+                { id: 'B1004', user: 'Sara Williams', vehicle: 'MH04GH3456', date: '2023-05-16', time: '02:00 - 02:30 PM', status: 'cancelled', created: '2023-05-15 11:30 AM' },
+                { id: 'B1005', user: 'Robert Brown', vehicle: 'MH05IJ7890', date: '2023-05-17', time: '03:30 - 04:00 PM', status: 'confirmed', created: '2023-05-16 09:00 AM' }
+            ];
+            
+            const bookingsTableBody = document.getElementById('bookingsTableBody');
+            bookingsTableBody.innerHTML = '';
+            
+            bookings.forEach(booking => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${booking.id}</td>
+                    <td>${booking.user}</td>
+                    <td>${booking.vehicle}</td>
+                    <td>${booking.date}</td>
+                    <td>${booking.time}</td>
+                    <td><span class="badge ${booking.status}">${booking.status}</span></td>
+                    <td>${booking.created}</td>
+                    <td class="actions">
+                        <button class="btn-action view" title="View Details"><i class="fas fa-eye"></i></button>
+                        <button class="btn-action edit" title="Edit Booking"><i class="fas fa-edit"></i></button>
+                        <button class="btn-action delete" title="Delete Booking"><i class="fas fa-trash-alt"></i></button>
+                    </td>
+                `;
+                bookingsTableBody.appendChild(row);
+            });
+            
+            // Users table
+            const users = [
+                { id: 'U101', name: 'John Doe', email: 'john@example.com', phone: '555-1234', bookings: 3, joined: '2023-05-10', status: 'active' },
+                { id: 'U102', name: 'Jane Smith', email: 'jane@example.com', phone: '555-5678', bookings: 2, joined: '2023-05-11', status: 'active' },
+                { id: 'U103', name: 'Mike Johnson', email: 'mike@example.com', phone: '555-9012', bookings: 1, joined: '2023-05-12', status: 'active' },
+                { id: 'U104', name: 'Sara Williams', email: 'sara@example.com', phone: '555-3456', bookings: 1, joined: '2023-05-13', status: 'inactive' },
+                { id: 'U105', name: 'Robert Brown', email: 'robert@example.com', phone: '555-7890', bookings: 0, joined: '2023-05-14', status: 'active' }
+            ];
+            
+            const usersTableBody = document.getElementById('usersTableBody');
+            usersTableBody.innerHTML = '';
+            
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.phone}</td>
+                    <td>${user.bookings}</td>
+                    <td>${user.joined}</td>
+                    <td><span class="badge ${user.status}">${user.status}</span></td>
+                    <td class="actions">
+                        <button class="btn-action view" title="View User Details"><i class="fas fa-eye"></i></button>
+                        <button class="btn-action edit" title="Edit User"><i class="fas fa-edit"></i></button>
+                        <button class="btn-action ${user.status === 'active' ? 'block' : 'activate'}" title="${user.status === 'active' ? 'Block User' : 'Activate User'}">
+                            <i class="fas ${user.status === 'active' ? 'fa-ban' : 'fa-check-circle'}"></i>
+                        </button>
+                    </td>
+                `;
+                usersTableBody.appendChild(row);
+            });
+            
+            // Time slots table
+            const slots = [
+                { id: 'S001', start: '09:00 AM', end: '09:30 AM', capacity: 5, status: 'active' },
+                { id: 'S002', start: '09:30 AM', end: '10:00 AM', capacity: 5, status: 'active' },
+                { id: 'S003', start: '10:00 AM', end: '10:30 AM', capacity: 5, status: 'active' },
+                { id: 'S004', start: '10:30 AM', end: '11:00 AM', capacity: 5, status: 'active' },
+                { id: 'S005', start: '11:00 AM', end: '11:30 AM', capacity: 5, status: 'active' },
+                { id: 'S006', start: '11:30 AM', end: '12:00 PM', capacity: 5, status: 'active' },
+                { id: 'S007', start: '02:00 PM', end: '02:30 PM', capacity: 5, status: 'active' },
+                { id: 'S008', start: '02:30 PM', end: '03:00 PM', capacity: 5, status: 'active' }
+            ];
+            
+            const slotsTableBody = document.getElementById('slotsTableBody');
+            slotsTableBody.innerHTML = '';
+            
+            slots.forEach(slot => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${slot.id}</td>
+                    <td>${slot.start}</td>
+                    <td>${slot.end}</td>
+                    <td>${slot.capacity}</td>
+                    <td><span class="badge ${slot.status}">${slot.status}</span></td>
+                    <td class="actions">
+                        <button class="btn-action edit" title="Edit Slot"><i class="fas fa-edit"></i></button>
+                        <button class="btn-action ${slot.status === 'active' ? 'disable' : 'enable'}" title="${slot.status === 'active' ? 'Disable Slot' : 'Enable Slot'}">
+                            <i class="fas ${slot.status === 'active' ? 'fa-toggle-off' : 'fa-toggle-on'}"></i>
+                        </button>
+                        <button class="btn-action delete" title="Delete Slot"><i class="fas fa-trash-alt"></i></button>
+                    </td>
+                `;
+                slotsTableBody.appendChild(row);
+            });
+            
+            // Set up event listeners for action buttons
+            setupActionButtons();
+        }
+        
+        // Setup action button functionality
+        function setupActionButtons() {
+            // Edit slot buttons
+            const editSlotBtns = document.querySelectorAll('#slotsTableBody .btn-action.edit');
+            editSlotBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const row = this.closest('tr');
+                    const slotId = row.cells[0].textContent;
+                    const startTime = row.cells[1].textContent;
+                    const endTime = row.cells[2].textContent;
+                    const capacity = row.cells[3].textContent;
+                    const status = row.cells[4].querySelector('.badge').textContent;
+                    
+                    document.getElementById('slotModalTitle').textContent = 'Edit Time Slot';
+                    document.getElementById('slotId').value = slotId;
+                    
+                    // Converting time for input field (simplified)
+                    document.getElementById('startTime').value = convertTimeToInputFormat(startTime);
+                    document.getElementById('endTime').value = convertTimeToInputFormat(endTime);
+                    
+                    document.getElementById('slotCapacity').value = capacity;
+                    document.getElementById('slotStatus').value = status;
+                    
+                    document.getElementById('slotModal').style.display = 'block';
+                });
+            });
+            
+            // Mock time conversion (simplified)
+            function convertTimeToInputFormat(timeStr) {
+                // This is a simplified version. In production, use proper time conversion
+                // Convert "09:00 AM" to "09:00"
+                const hour = timeStr.includes('AM') ? 
+                    parseInt(timeStr.split(':')[0]) : 
+                    (parseInt(timeStr.split(':')[0]) === 12 ? 12 : parseInt(timeStr.split(':')[0]) + 12);
+                
+                const minute = timeStr.split(':')[1].split(' ')[0];
+                
+                return `${hour.toString().padStart(2, '0')}:${minute}`;
+            }
+            
+            // Form submission handler
+            document.getElementById('slotForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                // In a real app, this would save the data to the server
+                alert('Time slot saved successfully!');
+                document.getElementById('slotModal').style.display = 'none';
+            });
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings | CNG Booking System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .bookings-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .bookings-header {
+            margin-bottom: 30px;
+        }
+        
+        .bookings-header h1 {
+            color: #4a6cf7;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .bookings-header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .booking-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .booking-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .booking-tab.active {
+            color: #4a6cf7;
+        }
+        
+        .booking-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #4a6cf7;
+        }
+        
+        .booking-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .booking-card {
+            border: 1px solid #e6e6e6;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        
+        .booking-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .booking-card-header {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-bottom: 1px solid #e6e6e6;
+        }
+        
+        .booking-date {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .booking-time {
+            color: #555;
+        }
+        
+        .booking-card-body {
+            padding: 15px;
+        }
+        
+        .booking-detail {
+            margin-bottom: 10px;
+        }
+        
+        .booking-label {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .booking-value {
+            font-weight: 500;
+        }
+        
+        .booking-status {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        .status-confirmed {
+            background-color: #d6f5e8;
+            color: #27ae60;
+        }
+        
+        .status-completed {
+            background-color: #d4edfa;
+            color: #2980b9;
+        }
+        
+        .status-cancelled {
+            background-color: #ffd3d3;
+            color: #c0392b;
+        }
+        
+        .booking-card-footer {
+            padding: 15px;
+            border-top: 1px solid #e6e6e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .booking-ref {
+            color: #666;
+            font-size: 13px;
+        }
+        
+        .btn-cancel {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-cancel:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-download {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-download:hover {
+            background-color: #2980b9;
+        }
+        
+        .no-bookings {
+            text-align: center;
+            padding: 40px 20px;
+            color: #777;
+        }
+        
+        .no-bookings i {
+            font-size: 60px;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .no-bookings p {
+            margin-bottom: 20px;
+        }
+        
+        .btn-book-now {
+            background-color: #4a6cf7;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: inline-block;
+            text-decoration: none;
+        }
+        
+        .btn-book-now:hover {
+            background-color: #3a5bd9;
+        }
+        
+        .loading {
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+        
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #4a6cf7;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .alert {
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .alert-success {
+            background-color: #d6f5e8;
+            color: #27ae60;
+            border: 1px solid #b8e5d4;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* Confirmation Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            animation: modalFade 0.3s;
+        }
+        
+        @keyframes modalFade {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            color: #333;
+        }
+        
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        @media (max-width: 768px) {
+            .booking-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container">
+            <div class="header-left">
+                <a href="index.html" class="logo">
+                    <i class="fas fa-gas-pump"></i> CNG Booking
+                </a>
+            </div>
+            <div class="header-right">
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="booking.html">Book a Slot</a></li>
+                        <li><a href="my-bookings.html" class="active">My Bookings</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </nav>
+                <div class="user-actions">
+                    <div id="loggedInUser" style="display: none;">
+                        <span id="userName"></span>
+                        <button id="logoutBtn" class="btn btn-sm">Logout</button>
+                    </div>
+                    <div id="guestUser">
+                        <a href="login.html" class="btn btn-primary">Login</a>
+                        <a href="register.html" class="btn">Register</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="bookings-container">
+            <div class="bookings-header">
+                <h1>My Bookings</h1>
+                <p>View and manage your CNG bookings</p>
+            </div>
+            
+            <div id="bookingAlert" class="alert"></div>
+            
+            <div class="booking-tabs">
+                <div class="booking-tab active" data-tab="all">All Bookings</div>
+                <div class="booking-tab" data-tab="confirmed">Confirmed</div>
+                <div class="booking-tab" data-tab="completed">Completed</div>
+                <div class="booking-tab" data-tab="cancelled">Cancelled</div>
+            </div>
+            
+            <div id="loadingBookings" class="loading">
+                <div class="loading-spinner"></div>
+            </div>
+            
+            <div id="bookingCards" class="booking-cards" style="display: none;">
+                <!-- Booking cards will be displayed here -->
+            </div>
+            
+            <div id="noBookings" class="no-bookings" style="display: none;">
+                <i class="fas fa-calendar-times"></i>
+                <h2>No Bookings Found</h2>
+                <p>You don't have any bookings yet. Start by booking a slot.</p>
+                <a href="booking.html" class="btn-book-now">Book a Slot Now</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="cancelModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Cancel Booking</h3>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to cancel this booking? This action cannot be undone.</p>
+                <p><strong>Booking Reference:</strong> <span id="cancelModalRef"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelModalClose" class="btn-secondary">No, Keep It</button>
+                <button id="cancelModalConfirm" class="btn-danger">Yes, Cancel Booking</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-gas-pump"></i> CNG Booking
+                </div>
+                <div class="footer-links">
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-social">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 CNG Booking System. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // API URL
+            const API_URL = 'http://localhost:4000/api';
+            
+            // Get elements
+            const bookingTabs = document.querySelectorAll('.booking-tab');
+            const bookingCards = document.getElementById('bookingCards');
+            const loadingBookings = document.getElementById('loadingBookings');
+            const noBookings = document.getElementById('noBookings');
+            const bookingAlert = document.getElementById('bookingAlert');
+            const cancelModal = document.getElementById('cancelModal');
+            const cancelModalRef = document.getElementById('cancelModalRef');
+            const cancelModalClose = document.getElementById('cancelModalClose');
+            const cancelModalConfirm = document.getElementById('cancelModalConfirm');
+            
+            // Current filter and booking to cancel
+            let currentFilter = 'all';
+            let currentBookingToCancel = null;
+            
+            // Check auth status
+            checkAuthStatus();
+            
+            // Load bookings
+            fetchBookings();
+            
+            // Event listeners
+            bookingTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Update active tab
+                    bookingTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Update filter
+                    currentFilter = tab.dataset.tab;
+                    
+                    // Filter bookings
+                    filterBookings();
+                });
+            });
+            
+            // Close modal events
+            cancelModalClose.addEventListener('click', closeModal);
+            cancelModal.addEventListener('click', event => {
+                if (event.target === cancelModal) {
+                    closeModal();
+                }
+            });
+            
+            // Confirm cancel booking
+            cancelModalConfirm.addEventListener('click', confirmCancelBooking);
+            
+            // Logout button
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', logout);
+            }
+            
+            // Functions
+            function checkAuthStatus() {
+                const token = localStorage.getItem('cng_token');
+                const user = JSON.parse(localStorage.getItem('cng_user') || '{}');
+                
+                if (token && user) {
+                    // User is logged in
+                    document.getElementById('userName').textContent = user.name || user.username;
+                    document.getElementById('loggedInUser').style.display = 'block';
+                    document.getElementById('guestUser').style.display = 'none';
+                } else {
+                    // Redirect to login
+                    window.location.href = 'login.html?redirect=my-bookings.html';
+                }
+            }
+            
+            function logout() {
+                localStorage.removeItem('cng_token');
+                localStorage.removeItem('cng_user');
+                window.location.href = 'login.html';
+            }
+            
+            async function fetchBookings() {
+                const token = localStorage.getItem('cng_token');
+                
+                try {
+                    const response = await fetch(`${API_URL}/bookings/my-bookings`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    const data = await response.json();
+                    
+                    loadingBookings.style.display = 'none';
+                    
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Error fetching bookings');
+                    }
+                    
+                    if (data.data.length === 0) {
+                        noBookings.style.display = 'block';
+                        return;
+                    }
+                    
+                    // Store bookings in a global variable
+                    window.userBookings = data.data;
+                    
+                    // Display bookings
+                    displayBookings(data.data);
+                    
+                } catch (error) {
+                    loadingBookings.style.display = 'none';
+                    showAlert(error.message, 'danger');
+                }
+            }
+            
+            function displayBookings(bookings) {
+                bookingCards.innerHTML = '';
+                
+                if (bookings.length === 0) {
+                    noBookings.style.display = 'block';
+                    bookingCards.style.display = 'none';
+                    return;
+                }
+                
+                noBookings.style.display = 'none';
+                bookingCards.style.display = 'grid';
+                
+                // Sort bookings by date, most recent first
+                bookings.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                bookings.forEach(booking => {
+                    const card = createBookingCard(booking);
+                    bookingCards.appendChild(card);
+                });
+                
+                // Apply the filter
+                filterBookings();
+            }
+            
+            function createBookingCard(booking) {
+                const card = document.createElement('div');
+                card.classList.add('booking-card');
+                card.dataset.status = booking.status;
+                
+                // Format dates and times
+                const formattedDate = formatDate(booking.date);
+                const formattedTime = `${formatTime(booking.start_time)} - ${formatTime(booking.end_time)}`;
+                
+                // Status class
+                const statusClass = `status-${booking.status}`;
+                
+                card.innerHTML = `
+                    <div class="booking-card-header">
+                        <div class="booking-date">${formattedDate}</div>
+                        <div class="booking-time">${formattedTime}</div>
+                    </div>
+                    <div class="booking-card-body">
+                        <div class="booking-status ${statusClass}">${capitalizeFirstLetter(booking.status)}</div>
+                        <div class="booking-detail">
+                            <div class="booking-label">Vehicle Number</div>
+                            <div class="booking-value">${booking.vehicle_number}</div>
+                        </div>
+                        <div class="booking-detail">
+                            <div class="booking-label">Booked On</div>
+                            <div class="booking-value">${formatDatetime(booking.created_at)}</div>
+                        </div>
+                    </div>
+                    <div class="booking-card-footer">
+                        <div class="booking-ref">Ref: ${booking.booking_reference}</div>
+                        <div class="booking-actions">
+                            ${booking.status === 'confirmed' ? 
+                                `<button class="btn-cancel" data-id="${booking.id}" data-ref="${booking.booking_reference}">Cancel</button>` : 
+                                `<button class="btn-download" data-id="${booking.id}">Receipt</button>`}
+                        </div>
+                    </div>
+                `;
+                
+                // Add event listener for cancel button
+                const cancelBtn = card.querySelector('.btn-cancel');
+                if (cancelBtn) {
+                    cancelBtn.addEventListener('click', () => {
+                        showCancelModal(booking.id, booking.booking_reference);
+                    });
+                }
+                
+                // Add event listener for download button
+                const downloadBtn = card.querySelector('.btn-download');
+                if (downloadBtn) {
+                    downloadBtn.addEventListener('click', () => {
+                        generateReceipt(booking);
+                    });
+                }
+                
+                return card;
+            }
+            
+            function filterBookings() {
+                const cards = bookingCards.querySelectorAll('.booking-card');
+                
+                cards.forEach(card => {
+                    if (currentFilter === 'all' || card.dataset.status === currentFilter) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                
+                // Check if any cards are visible
+                const visibleCards = Array.from(cards).filter(card => card.style.display !== 'none');
+                
+                if (visibleCards.length === 0) {
+                    noBookings.style.display = 'block';
+                    bookingCards.style.display = 'none';
+                } else {
+                    noBookings.style.display = 'none';
+                    bookingCards.style.display = 'grid';
+                }
+            }
+            
+            function showCancelModal(bookingId, bookingRef) {
+                currentBookingToCancel = bookingId;
+                cancelModalRef.textContent = bookingRef;
+                cancelModal.style.display = 'block';
+            }
+            
+            function closeModal() {
+                cancelModal.style.display = 'none';
+                currentBookingToCancel = null;
+            }
+            
+            async function confirmCancelBooking() {
+                if (!currentBookingToCancel) return;
+                
+                const token = localStorage.getItem('cng_token');
+                
+                try {
+                    const response = await fetch(`${API_URL}/bookings/${currentBookingToCancel}/cancel`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Error cancelling booking');
+                    }
+                    
+                    // Close modal
+                    closeModal();
+                    
+                    // Show success message
+                    showAlert('Booking cancelled successfully', 'success');
+                    
+                    // Refresh bookings
+                    fetchBookings();
+                    
+                } catch (error) {
+                    showAlert(error.message, 'danger');
+                }
+            }
+            
+            function generateReceipt(booking) {
+                const receiptHTML = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Booking Receipt - ${booking.booking_reference}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+                        .receipt { max-width: 800px; margin: 0 auto; border: 1px solid #ddd; padding: 20px; }
+                        .header { text-align: center; margin-bottom: 20px; }
+                        .header h1 { color: #4a6cf7; margin-bottom: 5px; }
+                        .details { margin-bottom: 20px; }
+                        .details h2 { color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+                        .detail-row { display: flex; margin-bottom: 10px; }
+                        .detail-label { flex: 1; font-weight: bold; color: #555; }
+                        .detail-value { flex: 2; }
+                        .footer { margin-top: 30px; text-align: center; color: #666; font-size: 14px; }
+                        .qr-code { text-align: center; margin: 20px 0; }
+                        .qr-code img { width: 150px; height: 150px; }
+                        .print-btn { display: flex; justify-content: center; margin: 20px 0; }
+                        .print-btn button { background-color: #4a6cf7; color: white; border: none; padding: 10px 20px; cursor: pointer; }
+                        @media print { .print-btn { display: none; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="receipt">
+                        <div class="header">
+                            <h1>CNG Booking System</h1>
+                            <p>Official Booking Receipt</p>
+                        </div>
+                        
+                        <div class="details">
+                            <h2>Booking Information</h2>
+                            <div class="detail-row">
+                                <div class="detail-label">Booking Reference:</div>
+                                <div class="detail-value">${booking.booking_reference}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Date:</div>
+                                <div class="detail-value">${formatDate(booking.date)}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Time Slot:</div>
+                                <div class="detail-value">${formatTime(booking.start_time)} - ${formatTime(booking.end_time)}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Status:</div>
+                                <div class="detail-value">${booking.status.toUpperCase()}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="details">
+                            <h2>Vehicle Information</h2>
+                            <div class="detail-row">
+                                <div class="detail-label">Vehicle Number:</div>
+                                <div class="detail-value">${booking.vehicle_number}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="qr-code">
+                            <p>Scan this QR code at the station</p>
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?data=${booking.booking_reference}&size=150x150" alt="QR Code">
+                        </div>
+                        
+                        <div class="footer">
+                            <p>Thank you for using the CNG Booking System</p>
+                            <p>This receipt was generated on ${new Date().toLocaleString()}</p>
+                        </div>
+                        
+                        <div class="print-btn">
+                            <button onclick="window.print()">Print Receipt</button>
+                        </div>
+                    </div>
+                </body>
+                </html>
+                `;
+                
+                const receiptWindow = window.open('', '_blank');
+                receiptWindow.document.write(receiptHTML);
+                receiptWindow.document.close();
+            }
+            
+            function showAlert(message, type) {
+                bookingAlert.textContent = message;
+                bookingAlert.className = 'alert';
+                bookingAlert.classList.add(`alert-${type}`);
+                bookingAlert.style.display = 'block';
+                
+                setTimeout(() => {
+                    bookingAlert.style.display = 'none';
+                }, 5000);
+            }
+            
+            function formatTime(timeStr) {
+                if (!timeStr) return '';
+                // Convert HH:MM:SS to 12-hour format (HH:MM AM/PM)
+                const [hours, minutes] = timeStr.split(':');
+                const hour = parseInt(hours);
+                const period = hour >= 12 ? 'PM' : 'AM';
+                const hour12 = hour % 12 || 12;
+                return `${hour12}:${minutes} ${period}`;
+            }
+            
+            function formatDate(dateStr) {
+                if (!dateStr) return '';
+                // Convert YYYY-MM-DD to DD Month YYYY
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('en-US', { 
+                    day: 'numeric', 
+                    month: 'long', 
+                    year: 'numeric' 
+                });
+            }
+            
+            function formatDatetime(datetimeStr) {
+                if (!datetimeStr) return '';
+                const date = new Date(datetimeStr);
+                return date.toLocaleString();
+            }
+            
+            function capitalizeFirstLetter(string) {
+                return string.charAt(0).toUpperCase() + string.slice(1);
+            }
+        });
+    </script>
+</body>
+</html> 

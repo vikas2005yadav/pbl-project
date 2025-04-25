@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book a CNG Slot | CNG Booking System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Booking Page Specific Styles */
+        .booking-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .booking-header {
+            margin-bottom: 30px;
+        }
+
+        .booking-header h1 {
+            color: #4a6cf7;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .booking-header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .booking-step {
+            margin-bottom: 30px;
+        }
+
+        .step-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .step-title .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #4a6cf7;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .step-title h2 {
+            font-size: 20px;
+            color: #333;
+            margin: 0;
+        }
+
+        .date-picker {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .date-picker input {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            flex: 1;
+            font-size: 16px;
+        }
+
+        .date-picker button {
+            background-color: #4a6cf7;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .date-picker button:hover {
+            background-color: #3a5bd9;
+        }
+
+        .slots-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .slot-card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .slot-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-color: #4a6cf7;
+        }
+
+        .slot-card.selected {
+            border-color: #4a6cf7;
+            background-color: rgba(74, 108, 247, 0.1);
+        }
+
+        .slot-card .time {
+            font-size: 18px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .slot-card .status {
+            font-size: 14px;
+            color: #27ae60;
+        }
+
+        .no-slots {
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            grid-column: 1 / -1;
+        }
+
+        .vehicle-form {
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            border-color: #4a6cf7;
+            outline: none;
+        }
+
+        .book-btn {
+            background-color: #4a6cf7;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        .book-btn:hover {
+            background-color: #3a5bd9;
+        }
+
+        .book-btn:disabled {
+            background-color: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .alert-success {
+            background-color: #d6f5e8;
+            color: #27ae60;
+            border: 1px solid #b8e5d4;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #4a6cf7;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Confirmation Page Styles */
+        .confirmation-container {
+            text-align: center;
+            padding: 30px;
+            display: none;
+        }
+
+        .confirmation-icon {
+            font-size: 60px;
+            color: #27ae60;
+            margin-bottom: 20px;
+        }
+
+        .confirmation-details {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .confirmation-details h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .detail-label {
+            flex: 1;
+            font-weight: 500;
+            color: #666;
+        }
+
+        .detail-value {
+            flex: 2;
+            color: #333;
+        }
+
+        .btn-download {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            margin-right: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .btn-download:hover {
+            background-color: #219653;
+        }
+
+        .btn-home {
+            background-color: #4a6cf7;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .btn-home:hover {
+            background-color: #3a5bd9;
+        }
+
+        @media (max-width: 768px) {
+            .slots-container {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container">
+            <div class="header-left">
+                <a href="index.html" class="logo">
+                    <i class="fas fa-gas-pump"></i> CNG Booking
+                </a>
+            </div>
+            <div class="header-right">
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="booking.html" class="active">Book a Slot</a></li>
+                        <li><a href="my-bookings.html">My Bookings</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </nav>
+                <div class="user-actions">
+                    <div id="loggedInUser" style="display: none;">
+                        <span id="userName"></span>
+                        <button id="logoutBtn" class="btn btn-sm">Logout</button>
+                    </div>
+                    <div id="guestUser">
+                        <a href="login.html" class="btn btn-primary">Login</a>
+                        <a href="register.html" class="btn">Register</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="booking-container" id="bookingForm">
+            <div class="booking-header">
+                <h1>Book a CNG Slot</h1>
+                <p>Select your preferred date and time to avoid waiting in queue</p>
+            </div>
+
+            <div id="bookingAlert" class="alert"></div>
+
+            <div class="booking-step">
+                <div class="step-title">
+                    <div class="step-number">1</div>
+                    <h2>Select a Date</h2>
+                </div>
+                <div class="date-picker">
+                    <input type="date" id="bookingDate" min="" value="">
+                    <button id="checkAvailability">Check Availability</button>
+                </div>
+            </div>
+
+            <div class="booking-step">
+                <div class="step-title">
+                    <div class="step-number">2</div>
+                    <h2>Choose a Time Slot</h2>
+                </div>
+                <div id="slotsLoading" class="loading" style="display: none;">
+                    <div class="loading-spinner"></div>
+                </div>
+                <div id="slotsContainer" class="slots-container">
+                    <div class="no-slots">Please select a date and check availability</div>
+                </div>
+            </div>
+
+            <div class="booking-step">
+                <div class="step-title">
+                    <div class="step-number">3</div>
+                    <h2>Enter Vehicle Details</h2>
+                </div>
+                <div class="vehicle-form">
+                    <div class="form-group">
+                        <label for="vehicleNumber">Vehicle Registration Number</label>
+                        <input type="text" id="vehicleNumber" placeholder="e.g. MH01AB1234" maxlength="10">
+                        <small style="color: #666; display: block; margin-top: 5px;">Format: MH01AB1234</small>
+                    </div>
+                    <button id="bookSlotBtn" class="book-btn" disabled>Book Now</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="confirmation-container" id="confirmationPage">
+            <div class="confirmation-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h1>Booking Confirmed!</h1>
+            <p>Your CNG slot has been successfully booked. Please arrive 5 minutes before your scheduled time.</p>
+            
+            <div class="confirmation-details">
+                <h3>Booking Details</h3>
+                <div class="detail-row">
+                    <div class="detail-label">Reference:</div>
+                    <div class="detail-value" id="confirmRef"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Date:</div>
+                    <div class="detail-value" id="confirmDate"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Time:</div>
+                    <div class="detail-value" id="confirmTime"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Vehicle:</div>
+                    <div class="detail-value" id="confirmVehicle"></div>
+                </div>
+            </div>
+            
+            <div>
+                <button class="btn-download" id="downloadReceipt">
+                    <i class="fas fa-download"></i> Download Receipt
+                </button>
+                <button class="btn-home" id="backToHome">
+                    <i class="fas fa-home"></i> Go to Home
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-gas-pump"></i> CNG Booking
+                </div>
+                <div class="footer-links">
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-social">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 CNG Booking System. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // API URL
+            const API_URL = 'http://localhost:4000/api';
+            
+            // Get elements
+            const bookingDateInput = document.getElementById('bookingDate');
+            const checkAvailabilityBtn = document.getElementById('checkAvailability');
+            const slotsContainer = document.getElementById('slotsContainer');
+            const slotsLoading = document.getElementById('slotsLoading');
+            const vehicleNumberInput = document.getElementById('vehicleNumber');
+            const bookSlotBtn = document.getElementById('bookSlotBtn');
+            const bookingAlert = document.getElementById('bookingAlert');
+            const bookingForm = document.getElementById('bookingForm');
+            const confirmationPage = document.getElementById('confirmationPage');
+            
+            // Set minimum date to today
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
+            bookingDateInput.setAttribute('min', todayStr);
+            bookingDateInput.value = todayStr;
+            
+            // Current selected slot
+            let selectedSlot = null;
+            
+            // Check auth status
+            checkAuthStatus();
+            
+            // Event listeners
+            checkAvailabilityBtn.addEventListener('click', fetchAvailableSlots);
+            vehicleNumberInput.addEventListener('input', validateVehicleNumber);
+            bookSlotBtn.addEventListener('click', bookSlot);
+            document.getElementById('backToHome').addEventListener('click', () => window.location.href = 'index.html');
+            document.getElementById('downloadReceipt').addEventListener('click', generateReceipt);
+            
+            // Logout button
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', logout);
+            }
+            
+            // Functions
+            function checkAuthStatus() {
+                const token = localStorage.getItem('cng_token');
+                const user = JSON.parse(localStorage.getItem('cng_user') || '{}');
+                
+                if (token && user) {
+                    // User is logged in
+                    document.getElementById('userName').textContent = user.name || user.username;
+                    document.getElementById('loggedInUser').style.display = 'block';
+                    document.getElementById('guestUser').style.display = 'none';
+                } else {
+                    // Redirect to login
+                    window.location.href = 'login.html?redirect=booking.html';
+                }
+            }
+            
+            function logout() {
+                localStorage.removeItem('cng_token');
+                localStorage.removeItem('cng_user');
+                window.location.href = 'login.html';
+            }
+            
+            async function fetchAvailableSlots() {
+                const date = bookingDateInput.value;
+                
+                if (!date) {
+                    showAlert('Please select a date', 'danger');
+                    return;
+                }
+                
+                // Reset slots
+                slotsContainer.innerHTML = '';
+                slotsLoading.style.display = 'flex';
+                selectedSlot = null;
+                bookSlotBtn.disabled = true;
+                
+                try {
+                    const response = await fetch(`${API_URL}/slots/date/${date}`);
+                    const data = await response.json();
+                    
+                    slotsLoading.style.display = 'none';
+                    
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Error fetching slots');
+                    }
+                    
+                    if (data.data.length === 0) {
+                        slotsContainer.innerHTML = '<div class="no-slots">No slots available for this date</div>';
+                        return;
+                    }
+                    
+                    // Display slots
+                    data.data.forEach(slot => {
+                        const slotCard = document.createElement('div');
+                        slotCard.classList.add('slot-card');
+                        slotCard.dataset.id = slot.id;
+                        
+                        // Format times for display
+                        const startTime = formatTime(slot.start_time);
+                        const endTime = formatTime(slot.end_time);
+                        
+                        slotCard.innerHTML = `
+                            <div class="time">${startTime} - ${endTime}</div>
+                            <div class="status">Available</div>
+                        `;
+                        
+                        slotCard.addEventListener('click', () => {
+                            // Deselect all other slots
+                            document.querySelectorAll('.slot-card').forEach(card => {
+                                card.classList.remove('selected');
+                            });
+                            
+                            // Select this slot
+                            slotCard.classList.add('selected');
+                            selectedSlot = slot;
+                            
+                            // Enable book button if vehicle number is valid
+                            validateVehicleNumber();
+                        });
+                        
+                        slotsContainer.appendChild(slotCard);
+                    });
+                    
+                } catch (error) {
+                    slotsLoading.style.display = 'none';
+                    showAlert(error.message, 'danger');
+                }
+            }
+            
+            function validateVehicleNumber() {
+                const vehicleNumber = vehicleNumberInput.value.trim();
+                const vehicleRegex = /^[A-Z]{2}[0-9]{2}[A-Z]{1,2}[0-9]{4}$/; // Format: MH01AB1234
+                
+                bookSlotBtn.disabled = !(selectedSlot && vehicleRegex.test(vehicleNumber));
+            }
+            
+            async function bookSlot() {
+                if (!selectedSlot || !vehicleNumberInput.value) {
+                    showAlert('Please select a slot and enter vehicle details', 'danger');
+                    return;
+                }
+                
+                bookSlotBtn.disabled = true;
+                bookSlotBtn.textContent = 'Booking...';
+                
+                const token = localStorage.getItem('cng_token');
+                
+                try {
+                    const response = await fetch(`${API_URL}/bookings`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            slot_id: selectedSlot.id,
+                            vehicle_number: vehicleNumberInput.value
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Error creating booking');
+                    }
+                    
+                    // Show confirmation page
+                    showConfirmation(data.data);
+                    
+                } catch (error) {
+                    showAlert(error.message, 'danger');
+                    bookSlotBtn.disabled = false;
+                    bookSlotBtn.textContent = 'Book Now';
+                }
+            }
+            
+            function showConfirmation(booking) {
+                // Populate confirmation details
+                document.getElementById('confirmRef').textContent = booking.booking_reference;
+                document.getElementById('confirmDate').textContent = formatDate(booking.date);
+                document.getElementById('confirmTime').textContent = `${formatTime(booking.start_time)} - ${formatTime(booking.end_time)}`;
+                document.getElementById('confirmVehicle').textContent = booking.vehicle_number;
+                
+                // Show confirmation page, hide booking form
+                bookingForm.style.display = 'none';
+                confirmationPage.style.display = 'block';
+                
+                // Scroll to top
+                window.scrollTo(0, 0);
+                
+                // Store booking info in localStorage for receipt generation
+                localStorage.setItem('last_booking', JSON.stringify(booking));
+            }
+            
+            function generateReceipt() {
+                const booking = JSON.parse(localStorage.getItem('last_booking') || '{}');
+                if (!booking.id) return;
+                
+                const receiptHTML = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Booking Receipt - ${booking.booking_reference}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+                        .receipt { max-width: 800px; margin: 0 auto; border: 1px solid #ddd; padding: 20px; }
+                        .header { text-align: center; margin-bottom: 20px; }
+                        .header h1 { color: #4a6cf7; margin-bottom: 5px; }
+                        .details { margin-bottom: 20px; }
+                        .details h2 { color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+                        .detail-row { display: flex; margin-bottom: 10px; }
+                        .detail-label { flex: 1; font-weight: bold; color: #555; }
+                        .detail-value { flex: 2; }
+                        .footer { margin-top: 30px; text-align: center; color: #666; font-size: 14px; }
+                        .qr-code { text-align: center; margin: 20px 0; }
+                        .qr-code img { width: 150px; height: 150px; }
+                        .print-btn { display: flex; justify-content: center; margin: 20px 0; }
+                        .print-btn button { background-color: #4a6cf7; color: white; border: none; padding: 10px 20px; cursor: pointer; }
+                        @media print { .print-btn { display: none; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="receipt">
+                        <div class="header">
+                            <h1>CNG Booking System</h1>
+                            <p>Official Booking Receipt</p>
+                        </div>
+                        
+                        <div class="details">
+                            <h2>Booking Information</h2>
+                            <div class="detail-row">
+                                <div class="detail-label">Booking Reference:</div>
+                                <div class="detail-value">${booking.booking_reference}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Date:</div>
+                                <div class="detail-value">${formatDate(booking.date)}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Time Slot:</div>
+                                <div class="detail-value">${formatTime(booking.start_time)} - ${formatTime(booking.end_time)}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Status:</div>
+                                <div class="detail-value">${booking.status.toUpperCase()}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="details">
+                            <h2>Vehicle Information</h2>
+                            <div class="detail-row">
+                                <div class="detail-label">Vehicle Number:</div>
+                                <div class="detail-value">${booking.vehicle_number}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="qr-code">
+                            <p>Scan this QR code at the station</p>
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?data=${booking.booking_reference}&size=150x150" alt="QR Code">
+                        </div>
+                        
+                        <div class="footer">
+                            <p>Thank you for using the CNG Booking System</p>
+                            <p>This receipt was generated on ${new Date().toLocaleString()}</p>
+                        </div>
+                        
+                        <div class="print-btn">
+                            <button onclick="window.print()">Print Receipt</button>
+                        </div>
+                    </div>
+                </body>
+                </html>
+                `;
+                
+                const receiptWindow = window.open('', '_blank');
+                receiptWindow.document.write(receiptHTML);
+                receiptWindow.document.close();
+            }
+            
+            function showAlert(message, type) {
+                bookingAlert.textContent = message;
+                bookingAlert.className = 'alert';
+                bookingAlert.classList.add(`alert-${type}`);
+                bookingAlert.style.display = 'block';
+                
+                setTimeout(() => {
+                    bookingAlert.style.display = 'none';
+                }, 5000);
+            }
+            
+            function formatTime(timeStr) {
+                if (!timeStr) return '';
+                // Convert HH:MM:SS to 12-hour format (HH:MM AM/PM)
+                const [hours, minutes] = timeStr.split(':');
+                const hour = parseInt(hours);
+                const period = hour >= 12 ? 'PM' : 'AM';
+                const hour12 = hour % 12 || 12;
+                return `${hour12}:${minutes} ${period}`;
+            }
+            
+            function formatDate(dateStr) {
+                if (!dateStr) return '';
+                // Convert YYYY-MM-DD to DD Month YYYY
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('en-US', { 
+                    day: 'numeric', 
+                    month: 'long', 
+                    year: 'numeric' 
+                });
+            }
+        });
+    </script>
+</body>
+</html> 

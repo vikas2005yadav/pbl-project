@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CNG Slot Booking System</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-gas-pump"></i> CNG Slot Booking System</h1>
+            <nav id="nav-menu">
+                <ul>
+                    <li><a href="#" id="home-link" class="active">Home</a></li>
+                    <li><a href="#" id="booking-link">Book Slot</a></li>
+                    <li><a href="#" id="my-bookings-link">My Bookings</a></li>
+                    <li class="auth-section">
+                        <a href="#" id="login-register-link">Login / Register</a>
+                        <a href="#" id="logout-link" style="display: none;">Logout</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <!-- Home Section -->
+            <section id="home-section" class="section active">
+                <div class="hero">
+                    <h2>Welcome to CNG Slot Booking System</h2>
+                    <p>Book your CNG slot in advance and save time</p>
+                    <button id="book-now-btn" class="btn btn-primary">Book Now</button>
+                </div>
+                <div class="features">
+                    <div class="feature">
+                        <i class="fas fa-clock"></i>
+                        <h3>Save Time</h3>
+                        <p>No more waiting in long queues</p>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-calendar-alt"></i>
+                        <h3>Plan Ahead</h3>
+                        <p>Book slots in advance</p>
+                    </div>
+                    <div class="feature">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>Guaranteed Service</h3>
+                        <p>Your slot is reserved for you</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Auth Section -->
+            <section id="auth-section" class="section">
+                <div class="auth-container">
+                    <div class="tabs">
+                        <button id="login-tab" class="tab-btn active">Login</button>
+                        <button id="register-tab" class="tab-btn">Register</button>
+                    </div>
+                    
+                    <!-- Login Form -->
+                    <form id="login-form" class="auth-form">
+                        <h3>Login to Your Account</h3>
+                        <div class="form-group">
+                            <label for="login-username">Username</label>
+                            <input type="text" id="login-username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Login</button>
+                        <div id="login-error" class="error-message"></div>
+                    </form>
+                    
+                    <!-- Register Form -->
+                    <form id="register-form" class="auth-form" style="display: none;">
+                        <h3>Create an Account</h3>
+                        <div class="form-group">
+                            <label for="register-name">Full Name</label>
+                            <input type="text" id="register-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-username">Username</label>
+                            <input type="text" id="register-username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password">Password</label>
+                            <input type="password" id="register-password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-confirm-password">Confirm Password</label>
+                            <input type="password" id="register-confirm-password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Register</button>
+                        <div id="register-error" class="error-message"></div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Booking Section -->
+            <section id="booking-section" class="section">
+                <h2>Book a CNG Slot</h2>
+                <div class="booking-container">
+                    <div class="date-picker">
+                        <h3>Select Date</h3>
+                        <input type="date" id="booking-date" min="" required>
+                        <button id="load-slots-btn" class="btn btn-secondary">Load Available Slots</button>
+                    </div>
+                    
+                    <div id="slots-container" class="slots-container">
+                        <h3>Available Slots</h3>
+                        <div id="slots-list" class="slots-list">
+                            <!-- Slots will be loaded here -->
+                            <p id="no-slots-message">Select a date to view available slots</p>
+                        </div>
+                    </div>
+                    
+                    <div id="booking-form-container" class="booking-form-container" style="display: none;">
+                        <h3>Booking Details</h3>
+                        <form id="booking-form">
+                            <div class="form-group">
+                                <label for="vehicle-number">Vehicle Number</label>
+                                <input type="text" id="vehicle-number" required>
+                            </div>
+                            <div class="selected-slot-info">
+                                <p>Selected Date: <span id="selected-date"></span></p>
+                                <p>Selected Time: <span id="selected-time"></span></p>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Confirm Booking</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- My Bookings Section -->
+            <section id="my-bookings-section" class="section">
+                <h2>My Bookings</h2>
+                <div id="my-bookings-container" class="my-bookings-container">
+                    <!-- Bookings will be loaded here -->
+                    <p id="no-bookings-message">You don't have any bookings yet</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 CNG Slot Booking System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/auth.js"></script>
+    <script src="js/booking.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html> 
