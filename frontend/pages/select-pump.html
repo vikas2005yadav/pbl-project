@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select CNG Pump - CNG Slot Booking System</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/booking.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-gas-pump"></i> CNG Slot Booking System</h1>
+            <nav id="nav-menu">
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="#" class="active">Book Slot</a></li>
+                    <li><a href="../my-bookings.html">My Bookings</a></li>
+                    <li class="auth-section">
+                        <a href="#" id="user-name"></a>
+                        <a href="#" id="logout-link">Logout</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="booking-step">
+                <div class="step-title">
+                    <div class="step-number">1</div>
+                    <h2>Select CNG Pump Station</h2>
+                </div>
+                <div class="pump-list" id="pump-list">
+                    <!-- Pumps will be loaded here -->
+                    <div class="loading">Loading pump stations...</div>
+                </div>
+            </div>
+
+            <div class="booking-summary">
+                <h3>Selected Pump</h3>
+                <div id="selected-pump-details">
+                    <p>Please select a pump station to proceed</p>
+                </div>
+                <button id="proceed-btn" class="btn btn-primary" disabled>Proceed to Select Time Slot</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 CNG Slot Booking System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const pumpList = document.getElementById('pump-list');
+            const selectedPumpDetails = document.getElementById('selected-pump-details');
+            const proceedBtn = document.getElementById('proceed-btn');
+            let selectedPumpId = null;
+
+            // Check authentication
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '../login.html?redirect=select-pump.html';
+                return;
+            }
+
+            // Display user name
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user) {
+                document.getElementById('user-name').textContent = user.name;
+            }
+
+            // Load pump stations
+            async function loadPumpStations() {
+                try {
+                    const response = await fetch(`${API_URL}/pumps`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Failed to load pump stations');
+                    }
+
+                    displayPumpStations(data.data);
+                } catch (error) {
+                    showAlert(error.message, 'error');
+                    pumpList.innerHTML = '<div class="error">Failed to load pump stations. Please try again.</div>';
+                }
+            }
+
+            function displayPumpStations(pumps) {
+                pumpList.innerHTML = '';
+                pumps.forEach(pump => {
+                    const pumpCard = document.createElement('div');
+                    pumpCard.className = 'pump-card';
+                    pumpCard.innerHTML = `
+                        <h3>${pump.name}</h3>
+                        <div class="pump-info">
+                            <p><i class="fas fa-map-marker-alt"></i> ${pump.address}</p>
+                            <p><i class="fas fa-clock"></i> Wait Time: ${pump.waitTime}</p>
+                            <p><i class="fas fa-star"></i> Rating: ${pump.rating.toFixed(1)} (${pump.totalRatings} ratings)</p>
+                        </div>
+                    `;
+
+                    pumpCard.addEventListener('click', () => {
+                        document.querySelectorAll('.pump-card').forEach(card => card.classList.remove('selected'));
+                        pumpCard.classList.add('selected');
+                        selectedPumpId = pump.id;
+                        
+                        selectedPumpDetails.innerHTML = `
+                            <div class="summary-item">
+                                <span class="summary-label">Pump Name:</span>
+                                <span class="summary-value">${pump.name}</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Address:</span>
+                                <span class="summary-value">${pump.address}</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Current Wait Time:</span>
+                                <span class="summary-value">${pump.waitTime}</span>
+                            </div>
+                        `;
+                        
+                        proceedBtn.disabled = false;
+                    });
+
+                    pumpList.appendChild(pumpCard);
+                });
+            }
+
+            // Handle proceed button click
+            proceedBtn.addEventListener('click', () => {
+                if (selectedPumpId) {
+                    localStorage.setItem('selected_pump_id', selectedPumpId);
+                    window.location.href = 'booking.html';
+                }
+            });
+
+            // Handle logout
+            document.getElementById('logout-link').addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '../login.html';
+            });
+
+            // Load pump stations on page load
+            loadPumpStations();
+        });
+
+        function showAlert(message, type) {
+            const alertElement = document.createElement('div');
+            alertElement.classList.add('alert', `alert-${type}`);
+            alertElement.textContent = message;
+
+            const container = document.querySelector('.container');
+            container.insertBefore(alertElement, container.firstChild);
+
+            setTimeout(() => alertElement.remove(), 5000);
+        }
+    </script>
+</body>
+</html>

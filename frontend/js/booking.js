@@ -1,143 +1,154 @@
+// API URL - update this with your backend URL
+const API_URL = 'http://localhost:3000/api';
+
 // DOM Elements
-const bookingForm = document.getElementById('booking-form');
-const pumpList = document.getElementById('pump-list');
-const bookingDate = document.getElementById('booking-date');
-const timeSlots = document.getElementById('time-slots');
-const summaryPump = document.getElementById('summary-pump');
-const summaryDate = document.getElementById('summary-date');
-const summaryTime = document.getElementById('summary-time');
-
-// Sample pump data
-const pumps = [
-    { id: 1, name: 'CNG Pump Station 1', location: 'Main Street, City Center' },
-    { id: 2, name: 'CNG Pump Station 2', location: 'Highway Road, Industrial Area' },
-    { id: 3, name: 'CNG Pump Station 3', location: 'Ring Road, Suburb Area' }
-];
-
-// Sample time slots
-const availableSlots = [
-    '09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM',
-    '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM',
-    '05:00 PM', '06:00 PM'
-];
-
-// Initialize booking page
 document.addEventListener('DOMContentLoaded', function() {
-    const pumpList = document.getElementById('pump-list');
     const bookingDate = document.getElementById('booking-date');
-    const timeSlots = document.getElementById('time-slots');
+    const loadSlotsBtn = document.getElementById('load-slots-btn');
+    const slotsList = document.getElementById('slots-list');
     const bookingForm = document.getElementById('booking-form');
+    const vehicleNumberInput = document.getElementById('vehicle-number');
+    const selectedDateSpan = document.getElementById('selected-date');
+    const selectedTimeSpan = document.getElementById('selected-time');
+    const bookingFormContainer = document.getElementById('booking-form-container');
+    
+    // Set minimum date to today
+    const today = new Date();
+    const maxDate = new Date();
+    maxDate.setDate(today.getDate() + 7); // Allow booking up to 7 days in advance
+    
+    bookingDate.min = today.toISOString().split('T')[0];
+    bookingDate.max = maxDate.toISOString().split('T')[0];
+    bookingDate.value = today.toISOString().split('T')[0];
 
-    // Set date constraints
-    if (bookingDate) {
-        const today = new Date();
-        const maxDate = new Date();
-        maxDate.setDate(today.getDate() + 7);
-        
-        bookingDate.min = today.toISOString().split('T')[0];
-        bookingDate.max = maxDate.toISOString().split('T')[0];
-        
-        bookingDate.addEventListener('change', function() {
-            const formattedDate = new Date(this.value).toLocaleDateString('en-US', {
+    // Load slots when button is clicked
+    loadSlotsBtn.addEventListener('click', async function() {
+        const date = bookingDate.value;
+        if (!date) {
+            showAlert('Please select a date first', 'error');
+            return;
+        }
+
+        try {
+            slotsList.innerHTML = '<div class="loading">Loading available slots...</div>';
+            
+            const response = await fetch(`${API_URL}/slots/date/${date}`);
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Error loading slots');
+            }
+
+            displaySlots(data.data);
+            selectedDateSpan.textContent = new Date(date).toLocaleDateString('en-US', {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
             });
-            // Ensure elements exist before accessing them
-            if (document.getElementById('summary-date')) {
-                document.getElementById('summary-date').textContent = formattedDate;
-            }
-            console.log('Date selected:', formattedDate);
-        });
-    }
+        } catch (error) {
+            showAlert(error.message, 'error');
+            slotsList.innerHTML = '<div class="error">Failed to load slots. Please try again.</div>';
+        }
+    });
 
-    // Load pump list
-    if (pumpList) {
-        pumps.forEach(pump => {
-            const pumpDiv = document.createElement('div');
-            pumpDiv.className = 'pump-item';
-            pumpDiv.innerHTML = `
-                <h3>${pump.name}</h3>
-                <p>${pump.location}</p>
-                <button type="button" class="select-pump" data-pump-id="${pump.id}">Select</button>
-            `;
-            pumpList.appendChild(pumpDiv);
-        });
+    function displaySlots(slots) {
+        if (!slots || slots.length === 0) {
+            slotsList.innerHTML = '<div class="no-slots">No slots available for this date</div>';
+            return;
+        }
 
-        // Handle pump selection
-        pumpList.addEventListener('click', function(e) {
-            if (e.target.classList.contains('select-pump')) {
-                const pumpId = e.target.dataset.pumpId;
-                const selectedPump = pumps.find(p => p.id === parseInt(pumpId));
-                
-                // Update UI
-                document.querySelectorAll('.pump-item').forEach(item => {
-                    item.classList.remove('active');
-                });
-                e.target.closest('.pump-item').classList.add('active');
-                
-                // Update summary
-                document.getElementById('summary-pump').textContent = selectedPump.name;
-                console.log('Pump selected:', selectedPump.name);
-            }
-        });
-    }
-
-    // Load time slots
-    if (timeSlots) {
-        availableSlots.forEach(slot => {
-            const slotDiv = document.createElement('div');
-            slotDiv.className = 'time-slot';
-            slotDiv.innerHTML = slot;
-            slotDiv.addEventListener('click', function() {
-                // Update UI
-                document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('active'));
-                this.classList.add('active');
-                
-                // Update summary
-                document.getElementById('summary-time').textContent = slot;
-                console.log('Time slot selected:', slot);
+        slotsList.innerHTML = '';
+        slots.forEach(slot => {
+            const slotCard = document.createElement('div');
+            slotCard.classList.add('slot-card');
+            slotCard.dataset.slotId = slot.id;
+            
+            const startTime = new Date(`2000-01-01T${slot.start_time}`).toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: 'numeric',
+                hour12: true
             });
-            timeSlots.appendChild(slotDiv);
+            const endTime = new Date(`2000-01-01T${slot.end_time}`).toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: 'numeric',
+                hour12: true
+            });
+
+            slotCard.innerHTML = `
+                <div class="time">${startTime} - ${endTime}</div>
+                <div class="status">Available</div>
+            `;
+
+            slotCard.addEventListener('click', function() {
+                document.querySelectorAll('.slot-card').forEach(card => card.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedTimeSpan.textContent = `${startTime} - ${endTime}`;
+                bookingFormContainer.style.display = 'block';
+            });
+
+            slotsList.appendChild(slotCard);
         });
     }
 
-    // Handle form submission
-    if (bookingForm) {
-        bookingForm.addEventListener('submit', function(e) {
-            e.preventDefault();
+    // Handle booking form submission
+    bookingForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
 
-            const selectedPump = document.getElementById('summary-pump').textContent;
-            const selectedDate = document.getElementById('summary-date').textContent;
-            const selectedTime = document.getElementById('summary-time').textContent;
+        const selectedSlot = document.querySelector('.slot-card.selected');
+        if (!selectedSlot) {
+            showAlert('Please select a time slot', 'error');
+            return;
+        }
 
-            // Validate selections
-            if (selectedPump === 'Not selected' || selectedDate === 'Not selected' || selectedTime === 'Not selected') {
-                console.error('Please select all booking details');
-                alert('Please select all booking details (Pump, Date, and Time)');
-                return;
+        const vehicleNumber = vehicleNumberInput.value.trim();
+        if (!validateVehicleNumber(vehicleNumber)) {
+            showAlert('Please enter a valid vehicle number', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/bookings`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({
+                    slot_id: selectedSlot.dataset.slotId,
+                    vehicle_number: vehicleNumber,
+                    date: bookingDate.value
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to create booking');
             }
 
-            // Create booking object
-            const booking = {
-                bookingId: Date.now(),
-                pump: selectedPump,
-                date: selectedDate,
-                time: selectedTime,
-                createdAt: new Date().toISOString()
-            };
+            // Redirect to success page with booking details
+            window.location.href = `booking-success.html?booking_id=${data.data.id}`;
+        } catch (error) {
+            showAlert(error.message, 'error');
+        }
+    });
 
-            // Save to localStorage
-            const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
-            bookings.push(booking);
-            localStorage.setItem('bookings', JSON.stringify(bookings));
+    // Helper functions
+    function validateVehicleNumber(number) {
+        // Update regex pattern based on your vehicle number format requirements
+        const pattern = /^[A-Z]{2}[0-9]{2}[A-Z]{1,2}[0-9]{4}$/;
+        return pattern.test(number);
+    }
 
-            console.log('Booking saved successfully:', booking);
-            alert('Booking confirmed! Your booking ID is: ' + booking.bookingId);
+    function showAlert(message, type) {
+        const alertElement = document.createElement('div');
+        alertElement.classList.add('alert', `alert-${type}`);
+        alertElement.textContent = message;
 
-            // Redirect to success page
-            window.location.href = 'booking-success.html';
-        });
+        const container = document.querySelector('.booking-container');
+        container.insertBefore(alertElement, container.firstChild);
+
+        setTimeout(() => alertElement.remove(), 5000);
     }
 });
